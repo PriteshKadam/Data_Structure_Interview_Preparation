@@ -1,0 +1,89 @@
+// Refer Problem : https://leetcode.com/problems/clone-graph/
+
+
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    vector<Node*> neighbors;
+    Node() {
+        val = 0;
+        neighbors = vector<Node*>();
+    }
+    Node(int _val) {
+        val = _val;
+        neighbors = vector<Node*>();
+    }
+    Node(int _val, vector<Node*> _neighbors) {
+        val = _val;
+        neighbors = _neighbors;
+    }
+};
+*/
+
+/*
+Points to note :
+Connected , UnDirected Graph
+Node -> vector<Node*> ngbhrs
+Node values : 1 to N . Visited <> size 100 mentioned in the constraints
+
+bfs -> 
+    unvisited node (allocate node -> store in map)
+    visited node ( refer map , add mapped node)
+
+Corner cases : 
+   
+*/
+
+class Solution {
+public:
+    Node* cloneGraph(Node* node) {
+        
+        if(!node) return node;
+
+        queue<Node*> bfsq; // Queue contains visited nodes
+        vector<bool> visited(101, false); // index = Node num ,  Max value = 100 so Max Index = 100 , so size = 101
+        vector<Node*> clone(101, NULL); // Contains address of cloned nodes. So clone[1] = clone on node 1 from original graph.
+
+        bfsq.push(node); 
+        visited[node->val] = true; 
+        clone[node->val] = new Node(node->val);
+		
+        while(!bfsq.empty()) 
+        {
+            Node *current = bfsq.front();
+            bfsq.pop();
+
+            Node *cloned = clone[current->val]; // CLone of current node
+            //printf("Current : %d Cloned : %d ", current->val, cloned->val);
+            for(Node *ngbr : current->neighbors) 
+            {
+                //printf("NBR : %d ", ngbr->val);
+                if(!clone[ngbr->val]){  // Create clone of neighbor node if not already done.
+                    clone[ngbr->val] = new Node(ngbr->val);
+                }
+
+                cloned->neighbors.push_back(clone[ngbr->val]); // Add to the neighbors list of cloned current node.
+
+                if(!visited[ngbr->val]) // Mark the neighbor as visited and push into the queue.
+                {
+                    bfsq.push(ngbr);
+                    //printf("Push : %d ", ngbr->val);
+                    visited[ngbr->val] = true;
+                }
+            }
+
+            //printf("\n");
+        }
+
+        return clone[node->val];
+    }
+};
+
+// Time complexity :
+// O(N + E) , Each node visited atleast once + Once for every edge.
+
+
+
+
